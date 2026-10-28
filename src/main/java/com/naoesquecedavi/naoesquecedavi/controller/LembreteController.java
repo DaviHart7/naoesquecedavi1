@@ -1,5 +1,6 @@
 package com.naoesquecedavi.naoesquecedavi.controller;
 
+import com.naoesquecedavi.naoesquecedavi.dto.LembreteResponseDTO;
 import com.naoesquecedavi.naoesquecedavi.model.Lembrete;
 import com.naoesquecedavi.naoesquecedavi.model.Status;
 import org.springframework.http.HttpStatus;
@@ -98,5 +99,47 @@ public class LembreteController {
             }
         }
         return Optional.empty();
+    }
+
+    @PostMapping
+    public ResponseEntity<LembreteResponseDTO> cadastrar(
+            @Valid @RequestBody LembreteRequestDTO request) {
+
+        Lembrete lembrete = new Lembrete();
+        lembrete.setId(geradorId.getAndIncrement());
+        lembrete.setTitulo(request.getTitulo());
+        lembrete.setDescricao(request.getDescricao());
+        lembrete.setDataHora(request.getDataHora());
+        lembrete.setPrioridade(request.getPrioridade());
+        lembrete.setStatus(Status.PENDENTE);
+        lembrete.setCriadoEm(LocalDateTime.now());
+        lembrete.setAtualizadoEm(LocalDateTime.now());
+
+        lembretes.add(lembrete);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(LembreteResponseDTO.fromEntity(lembrete));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<LembreteResponseDTO>> listar() {
+        List<LembreteResponseDTO> dtos = new ArrayList<>();
+        for (Lembrete l : lembretes) {
+            dtos.add(LembreteResponseDTO.fromEntity(l));
+        }
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LembreteResponseDTO> buscarPorId(
+            @PathVariable Long id) {
+
+        Optional<Lembrete> lembreteOpt = buscarPorId(id);
+
+        if (lembreteOpt.isPresent()) {
+            return ResponseEntity.ok(
+                    LembreteResponseDTO.fromEntity(lembreteOpt.get()));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.naoesquecedavi.naoesquecedavi.dto;
 
-import com.naoesquece.api.model.Prioridade;
+import com.naoesquecedavi.naoesquecedavi.model.Prioridade;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

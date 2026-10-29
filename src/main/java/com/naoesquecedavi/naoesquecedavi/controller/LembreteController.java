@@ -2,6 +2,7 @@ package com.naoesquecedavi.naoesquecedavi.controller;
 
 import com.naoesquecedavi.naoesquecedavi.dto.LembreteRequestDTO;
 import com.naoesquecedavi.naoesquecedavi.dto.LembreteResponseDTO;
+import com.naoesquecedavi.naoesquecedavi.exception.ResourceNotFoundException;
 import com.naoesquecedavi.naoesquecedavi.model.Lembrete;
 import com.naoesquecedavi.naoesquecedavi.model.Status;
 import jakarta.validation.Valid;
@@ -115,6 +116,15 @@ public class LembreteController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    private Lembrete obterLembreteOuLancarExcecao(Long id) {
+        for (Lembrete l : lembretes) {
+            if (l.getId().equals(id)) {
+                return l;
+            }
+        }
+        throw new ResourceNotFoundException("Lembrete não encontrado com ID: " + id);
     }
 
 }

@@ -3,6 +3,7 @@ package com.naoesquecedavi.naoesquecedavi.service;
 import com.naoesquecedavi.naoesquecedavi.dto.LembreteRequestDTO;
 import com.naoesquecedavi.naoesquecedavi.dto.LembreteResponseDTO;
 import com.naoesquecedavi.naoesquecedavi.model.Lembrete;
+import com.naoesquecedavi.naoesquecedavi.model.Prioridade;
 import com.naoesquecedavi.naoesquecedavi.model.Status;
 import com.naoesquecedavi.naoesquecedavi.repository.LembreteRepository;
 import org.springframework.stereotype.Service;
@@ -68,5 +69,45 @@ public class LembreteService {
     public LembreteResponseDTO concluir(Long id) {
         Lembrete lembrete = obterEntidadePorId(id);
         return null;
+    }
+    public List<LembreteResponseDTO> listarComFiltros(Status status,
+                                                      Prioridade prioridade) {
+        List<Lembrete> resultado;
+        if (status != null && prioridade != null) {
+            resultado = lembreteRepository.findByStatusAndPrioridade(status,
+                    prioridade);
+        } else if (status != null) {
+            resultado = lembreteRepository.findByStatus(status);
+        } else if (prioridade != null) {
+            resultado = lembreteRepository.findByPrioridade(prioridade);
+        } else {
+            resultado = lembreteRepository.findAll();
+        }
+
+        List<LembreteResponseDTO> dtos = new ArrayList<>();
+        for (Lembrete l : resultado) {
+            dtos.add(LembreteResponseDTO.fromEntity(l));
+        }
+        return dtos;
+    }
+
+    public List<LembreteResponseDTO> buscarPorPeriodo(LocalDateTime inicio,
+                                                      LocalDateTime fim) {
+        List<Lembrete> lembretes = lembreteRepository.findByDataHoraBetween(inicio, fim);
+        List<LembreteResponseDTO> dtos = new ArrayList<>();
+        for (Lembrete l : lembretes) {
+            dtos.add(LembreteResponseDTO.fromEntity(l));
+        }
+        return dtos;
+    }
+
+    public List<LembreteResponseDTO> listarAtrasados() {
+        List<Lembrete> lembretes = lembreteRepository.findByStatusAndDataHoraBefore(
+                Status.PENDENTE, LocalDateTime.now());
+        List<LembreteResponseDTO> dtos = new ArrayList<>();
+        for (Lembrete l : lembretes) {
+            dtos.add(LembreteResponseDTO.fromEntity(l));
+        }
+        return dtos;
     }
 }

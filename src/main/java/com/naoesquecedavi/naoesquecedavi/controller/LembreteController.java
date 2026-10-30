@@ -4,9 +4,11 @@ import com.naoesquecedavi.naoesquecedavi.dto.LembreteRequestDTO;
 import com.naoesquecedavi.naoesquecedavi.dto.LembreteResponseDTO;
 import com.naoesquecedavi.naoesquecedavi.exception.ResourceNotFoundException;
 import com.naoesquecedavi.naoesquecedavi.model.Lembrete;
+import com.naoesquecedavi.naoesquecedavi.model.Prioridade;
 import com.naoesquecedavi.naoesquecedavi.model.Status;
 import com.naoesquecedavi.naoesquecedavi.service.LembreteService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -103,15 +105,6 @@ public class LembreteController {
                 .body(LembreteResponseDTO.fromEntity(lembrete));
     }
 
-    @GetMapping
-    public ResponseEntity<List<LembreteResponseDTO>> listar() {
-        List<LembreteResponseDTO> dtos = new ArrayList<>();
-        for (Lembrete l : lembretes) {
-            dtos.add(LembreteResponseDTO.fromEntity(l));
-        }
-        return ResponseEntity.ok(dtos);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<LembreteResponseDTO> buscarLembretePorIdPorId(@PathVariable Long id) {
         Optional<Lembrete> lembreteOpt = buscarLembretePorId(id);
@@ -131,5 +124,23 @@ public class LembreteController {
         }
         throw new ResourceNotFoundException("Lembrete não encontrado com ID: " + id);
     }
+    @GetMapping
+    public ResponseEntity<List<LembreteResponseDTO>> listar(
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false) Prioridade prioridade) {
+        return ResponseEntity.ok(lembreteService.listarComFiltros(status,
+                prioridade));
+    }
 
+    @GetMapping("/periodo")
+    public ResponseEntity<List<LembreteResponseDTO>> buscarPorPeriodo(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(lembreteService.buscarPorPeriodo(inicio, fim));
+    }
+
+    @GetMapping("/atrasados")
+    public ResponseEntity<List<LembreteResponseDTO>> listarAtrasados() {
+        return ResponseEntity.ok(lembreteService.listarAtrasados());
+    }
 }

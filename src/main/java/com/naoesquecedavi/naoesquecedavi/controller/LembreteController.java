@@ -5,6 +5,7 @@ import com.naoesquecedavi.naoesquecedavi.dto.LembreteResponseDTO;
 import com.naoesquecedavi.naoesquecedavi.exception.ResourceNotFoundException;
 import com.naoesquecedavi.naoesquecedavi.model.Lembrete;
 import com.naoesquecedavi.naoesquecedavi.model.Status;
+import com.naoesquecedavi.naoesquecedavi.service.LembreteService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,11 @@ public class LembreteController {
 
     private final List<Lembrete> lembretes = new ArrayList<>();
     private final AtomicLong geradorId = new AtomicLong(1);
+    private final LembreteService lembreteService;
 
+    public LembreteController(LembreteService lembreteService) {
+        this.lembreteService = lembreteService;
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Lembrete> atualizar(@PathVariable Long id, @RequestBody Lembrete lembreteAtualizado) {
